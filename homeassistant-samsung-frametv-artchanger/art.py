@@ -111,6 +111,7 @@ def get_image_for_tv(tv_ip: str):
     resized_image_data = utils.resize_and_crop_image(image_data)
 
     save_debug_image(resized_image_data, f'debug_{selected_source.__name__}_resized.jpg')
+    export_for_home_assistant(resized_image_data)
 
     return resized_image_data, file_type, image_url, None, selected_source.__name__
 
@@ -119,6 +120,20 @@ def save_debug_image(image_data: BytesIO, filename: str) -> None:
         with open(filename, 'wb') as f:
             f.write(image_data.getvalue())
         logging.info(f'Debug image saved as {filename}')
+
+def export_for_home_assistant(image_data: BytesIO) -> None:
+    try:
+        export_dir = '/config/www'
+        export_path = f'{export_dir}/frame-current.jpg'
+
+        os.makedirs(export_dir, exist_ok=True)
+
+        with open(export_path, 'wb') as f:
+            f.write(image_data.getvalue())
+
+        logging.info(f'Exported current art image to {export_path}')
+    except Exception as e:
+        logging.error(f'Failed to export current art image for Home Assistant: {e}')
 
 if tvip:
     if len(tvip) > 1 and use_same_image:
