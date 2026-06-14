@@ -58,7 +58,7 @@ utils = Utils(args.tvip, uploaded_files)
 
 def process_tv(tv_ip: str, image_data: BytesIO, file_type: str, image_url: str, remote_filename: str, source_name: str):
     tv = SamsungTVWS(tv_ip)
-    
+
     # Check if TV supports art mode
     if not tv.art().supported():
         logging.warning(f'TV at {tv_ip} does not support art mode.')
@@ -73,21 +73,18 @@ def process_tv(tv_ip: str, image_data: BytesIO, file_type: str, image_url: str, 
 
             tv.art().select_image(remote_filename, show=True)
             logging.info(f'Image uploaded and selected on TV at {tv_ip}')
-            # Add the filename to the list of uploaded filenames
             uploaded_files.append({
                 'file': image_url,
                 'remote_filename': remote_filename,
                 'tv_ip': tv_ip if len(tvip) > 1 else None,
                 'source': source_name
             })
-            # Save the list of uploaded filenames to the file
             with open(upload_list_path, 'w') as f:
                 json.dump(uploaded_files, f)
         except Exception as e:
             logging.error(f'There was an error uploading the image to TV at {tv_ip}: ' + str(e))
     else:
         if not args.upload_all:
-            # Select the image using the remote file name only if not in 'upload-all' mode
             logging.info(f'Setting existing image on TV at {tv_ip}, skipping upload')
             tv.art().select_image(remote_filename, show=True)
 
@@ -123,7 +120,7 @@ def save_debug_image(image_data: BytesIO, filename: str) -> None:
 
 def export_for_home_assistant(image_data: BytesIO) -> None:
     try:
-        export_dir = '/config/www'
+        export_dir = '/homeassistant/www'
         export_path = f'{export_dir}/frame-current.jpg'
 
         os.makedirs(export_dir, exist_ok=True)
